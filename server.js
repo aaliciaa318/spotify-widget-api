@@ -8,7 +8,8 @@ app.use(cors());
 
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const REDIRECT_URI = "https://spotify-widget.vercel.app/callback";
+const REDIRECT_URI = "https://spotify-widget.vercel.app/callback"; // Replace with your deployed Vercel URL
+
 let accessToken = null;
 
 // Step 1: Redirect user to Spotify login
@@ -19,7 +20,7 @@ app.get("/login", (req, res) => {
   res.redirect(authURL);
 });
 
-// Step 2: Handle Spotify callback
+// Step 2: Handle Spotify callback and retrieve access token
 app.get("/callback", async (req, res) => {
   const code = req.query.code;
   try {
@@ -38,23 +39,28 @@ app.get("/callback", async (req, res) => {
         },
       }
     );
+
     accessToken = response.data.access_token;
-    res.send("Authentication successful! You can now close this tab.");
+    res.send("Authentication successful! You can now fetch data.");
   } catch (error) {
-    console.error("Error getting access token:", error.response?.data || error);
-    res.send("Authentication failed.");
+    console.error("Error getting token:", error.response?.data || error);
+    res.status(500).json({ error: "Authentication failed" });
   }
 });
 
-// Step 3: Fetch Now Playing Track
+// Step 3: Fetch the currently playing track
 app.get("/current-track", async (req, res) => {
-  if (!accessToken) return res.json({ error: "User not authenticated" });
+  if (!accessToken) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
 
   try {
     const response = await axios.get(
       "https://api.spotify.com/v1/me/player/currently-playing",
       {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       }
     );
 
@@ -78,10 +84,9 @@ app.get("/current-track", async (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
-  console.log(`Server running at https://spotify-widget.vercel.app`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });
 
-// Export the app for deployment
+// Export app for deployment
 module.exports = app;
