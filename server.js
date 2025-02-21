@@ -80,5 +80,4 @@ app.get("/current-track", async (req, res) => {
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running at https://spotify-widget.vercel.app`);
-});
+  console.log(`Server running at https://spotify-widget.vercel.module.exports = app;
