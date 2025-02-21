@@ -6,10 +6,9 @@ const cors = require("cors");
 const app = express();
 app.use(cors());
 
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
+const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
+const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const REDIRECT_URI = "https://spotify-widget.vercel.app/callback";
-
 let accessToken = null;
 
 // Step 1: Redirect user to Spotify login
